@@ -4,6 +4,8 @@ const cors = require('cors');
 const https = require('https');
 const fs = require('fs');
 const path = require('path');
+const { createServer } = require('http');
+const { Server } = require('socket.io');
 const { connectDB } = require('./config/database');
 
 // Import authentication routes
@@ -32,7 +34,27 @@ const workflowsRoutes = require('./routes/workflows');
 const workflowNodesRoutes = require('./routes/workflowNodes');
 const approvalsRoutes = require('./routes/approvals');
 
+// Import Chat routes and WebSocket
+const chatRoutes = require('./routes/chat');
+const ChatSocket = require('./utils/chatSocket');
+
+// Import Reviews routes
+const reviewsRoutes = require('./routes/reviews');
+
+// Import Reports routes
+const reportsRoutes = require('./routes/reports');
+
 const app = express();
+const httpServer = createServer(app);
+const io = new Server(httpServer, {
+  cors: {
+    origin: process.env.CORS_ORIGIN || '*',
+    methods: ['GET', 'POST']
+  }
+});
+
+// Initialize Chat WebSocket
+const chatSocket = new ChatSocket(io);
 
 // Connect to database
 connectDB();
@@ -73,6 +95,9 @@ app.use('/api/auth', authRoutes);
 // Tickets Routes
 app.use('/api/tickets', ticketsRoutes);
 
+// Reviews Routes
+app.use('/api/reviews', reviewsRoutes);
+
 // Public Web Routes (no authentication required)
 app.use('/api/web', webPublicRoutes);
 
@@ -81,6 +106,23 @@ app.use('/api/users', usersRoutes);
 
 // Permissions Routes
 app.use('/api/permissions', permissionsRoutes);
+
+// Roles Routes
+app.use('/api/roles', rolesRoutes);
+
+// Reprint Requests Routes
+app.use('/api/reprint-requests', reprintRequestsRoutes);
+
+// Workflows Routes
+app.use('/api/workflows', workflowsRoutes);
+app.use('/api/workflow-nodes', workflowNodesRoutes);
+app.use('/api/approvals', approvalsRoutes);
+
+// Chat Routes (with WebSocket support)
+app.use('/api/chat', chatRoutes);
+
+// Reports Routes
+app.use('/api/reports', reportsRoutes);
 
 // Roles Routes
 app.use('/api/roles', rolesRoutes);
@@ -197,9 +239,10 @@ app.use((err, req, res, next) => {
 
 const PORT = process.env.PORT || 5000;
 
-// HTTP Configuration
-app.listen(PORT, () => {
+// Start HTTP server with Socket.io
+httpServer.listen(PORT, () => {
   console.log(`🌐 Server running on http://localhost:${PORT}`);
+  console.log(`💬 WebSocket server running on ws://localhost:${PORT}`);
   console.log(`📚 API Documentation: http://localhost:${PORT}/api`);
   console.log(`❤️  Health Check: http://localhost:${PORT}/api/health`);
 });
