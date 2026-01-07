@@ -91,6 +91,21 @@ const permissions = [
     description: 'Assign user to workflow',
     parent_id: null, // Will be set after 'workflow' is created
   },
+  {
+    name: 'add stage',
+    description: 'Add stage',
+    parent_id: null, // Will be set after 'workflow' is created
+  },
+  {
+    name: 'edit approve stage',
+    description: 'Edit approve stage',
+    parent_id: null, // Will be set after 'workflow' is created
+  },
+  {
+    name: 'delete approve stage',
+    description: 'Delete approve stage',
+    parent_id: null, // Will be set after 'workflow' is created
+  },
 
   // User - Parent
   {
@@ -238,7 +253,7 @@ const parentPermissions = [
 const childPermissionMap = {
   'access': ['portal'],
   'tickets': ['create ticket', 'update ticket', 'delete ticket', 'assign workflow to ticket', 'add reviews', 'view all tickets'],
-  'workflow': ['view workflow', 'create workflow', 'edit workflow', 'delete workflow', 'assign user to workflow'],
+  'workflow': ['view workflow', 'create workflow', 'edit workflow', 'delete workflow', 'assign user to workflow', 'add stage', 'edit approve stage', 'delete approve stage'],
   'user': ['view users', 'add user', 'edit user', 'delete user', 'change user status'],
   'role': ['view roles', 'create role', 'edit role', 'delete role'],
   'reports': ['view ticket reports', 'view user reports', 'view workflow reports', 'view review reports', 'create custom reports'],
