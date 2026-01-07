@@ -13,11 +13,11 @@ const permissions = [
     description: 'Access control and navigation',
     parent_id: null,
   },
-  {
-    name: 'app',
-    description: 'Access to app',
-    parent_id: null, // Will be set after 'access' is created
-  },
+  // {
+  //   name: 'app',
+  //   description: 'Access to app',
+  //   parent_id: null, // Will be set after 'access' is created
+  // },
   {
     name: 'portal',
     description: 'Access to portal',
@@ -31,33 +31,35 @@ const permissions = [
     parent_id: null,
   },
   {
-    name: 'view tickets',
-    description: 'View tickets',
+    name: 'create ticket',
+    description: 'Create ticket',
     parent_id: null, // Will be set after 'tickets' is created
   },
   {
-    name: 'add reprint request',
-    description: 'Add request reprint',
+    name: 'update ticket',
+    description: 'Update ticket',
     parent_id: null, // Will be set after 'tickets' is created
   },
-
-  // Reprint Requests - Parent
   {
-    name: 'reprint requests',
-    description: 'Reprint request management',
-    parent_id: null,
+    name: 'delete ticket',
+    description: 'Delete ticket',
+    parent_id: null, // Will be set after 'tickets' is created
   },
   {
-    name: 'view reprint requests',
-    description: 'View reprint requests',
-    parent_id: null, // Will be set after 'reprint_requests' is created
+    name: 'assign workflow to ticket',
+    description: 'Assign workflow to ticket',
+    parent_id: null, // Will be set after 'tickets' is created
   },
   {
-    name: 'add approval workflow',
-    description: 'Add approval workflow',
-    parent_id: null, // Will be set after 'reprint_requests' is created
+    name: 'add reviews',
+    description: 'Add reviews',
+    parent_id: null, // Will be set after 'tickets' is created
   },
-
+  {
+    name: 'view all tickets',
+    description: 'View all tickets',
+    parent_id: null, // Will be set after 'tickets' is created
+  },
   // Workflow - Parent
   {
     name: 'workflow',
@@ -149,44 +151,100 @@ const permissions = [
     parent_id: null, // Will be set after 'role' is created
   },
 
-  // App Permissions - Parent
+  // Reports - Parent
   {
-    name: 'app permissions',
-    description: 'App permissions management',
+    name: 'reports',
+    description: 'Reports management',
     parent_id: null,
   },
   {
-    name: 'scan',
-    description: 'Scan permission',
-    parent_id: null, // Will be set after 'app_permissions' is created
+    name: 'view ticket reports',
+    description: 'View ticket reports',
+    parent_id: null, // Will be set after 'reports' is created
   },
   {
-    name: 'reprint',
-    description: 'Reprint permission',
-    parent_id: null, // Will be set after 'app_permissions' is created
+    name: 'view user reports',
+    description: 'View user reports',
+    parent_id: null, // Will be set after 'reports' is created
   },
+  {
+    name: 'view workflow reports',
+    description: 'View workflow reports',
+    parent_id: null, // Will be set after 'reports' is created
+  },
+  {
+    name: 'view review reports',
+    description: 'View review reports',
+    parent_id: null, // Will be set after 'reports' is created
+  },
+  {
+    name: 'create custom reports',
+    description: 'Create custom reports',
+    parent_id: null, // Will be set after 'reports' is created
+  },
+
+  // Approval Progress - Parent
+  {
+    name: 'approval progress',
+    description: 'Approval progress management',
+    parent_id: null,
+  },
+  {
+    name: 'view all progress',
+    description: 'View progress',
+    parent_id: null, // Will be set after 'approval progress' is created
+  },
+
+  // Messages - Parent
+  {
+    name: 'messages',
+    description: 'Messages management',
+    parent_id: null,
+  },
+  {
+    name: 'allow chats',
+    description: 'Allow chats',
+    parent_id: null, // Will be set after 'messages' is created
+  },
+
+  // Reviews - Parent
+  {
+    name: 'reviews',
+    description: 'Reviews management',
+    parent_id: null,
+  },
+  {
+    name: 'view all reviews',
+    description: 'View all reviews',
+    parent_id: null, // Will be set after 'reviews' is created
+  },
+
 ];
 
 // Parent permission names that should have parent_id = null (root level)
 const parentPermissions = [
   'access',
   'tickets',
-  'reprint requests',
   'workflow',
   'user',
   'role',
-  'app permissions',
+  'reports',
+  'approval progress',
+  'messages',
+  'reviews',
 ];
 
 // Child permission mappings
 const childPermissionMap = {
-  'access': ['app', 'portal'],
-  'tickets': ['view tickets', 'add reprint request'],
-  'reprint requests': ['view reprint requests', 'add approval workflow'],
+  'access': ['portal'],
+  'tickets': ['create ticket', 'update ticket', 'delete ticket', 'assign workflow to ticket', 'add reviews', 'view all tickets'],
   'workflow': ['view workflow', 'create workflow', 'edit workflow', 'delete workflow', 'assign user to workflow'],
   'user': ['view users', 'add user', 'edit user', 'delete user', 'change user status'],
   'role': ['view roles', 'create role', 'edit role', 'delete role'],
-  'app permissions': ['scan', 'reprint'],
+  'reports': ['view ticket reports', 'view user reports', 'view workflow reports', 'view review reports', 'create custom reports'],
+  'approval progress': ['view all progress'],
+  'messages': ['allow chats'],
+  'reviews': ['view all reviews'],
 };
 
 const seed = async () => {

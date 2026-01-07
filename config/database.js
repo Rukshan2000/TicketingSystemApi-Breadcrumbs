@@ -3,11 +3,11 @@ const { Pool } = require('pg');
 require('dotenv').config();
 
 const pool = new Pool({
-  host: process.env.DB_HOST || '127.0.0.1',
-  port: process.env.DB_PORT || 5432,
-  database: process.env.DB_DATABASE || 'ocr',
-  user: process.env.DB_USERNAME || 'miniduhimal',
-  password: process.env.DB_PASSWORD || '12345678',
+  host: process.env.DB_HOST ,
+  port: process.env.DB_PORT ,
+  database: process.env.DB_DATABASE,
+  user: process.env.DB_USERNAME ,
+  password: process.env.DB_PASSWORD ,
 });
 
 const connectDB = async () => {
