@@ -1,0 +1,80 @@
+const { connectDB } = require('../../config/database');
+
+require('dotenv').config();
+
+/**
+ * Migration Runner
+ * Runs all migrations in sequence
+ * Usage: npm run migrate
+ */
+
+const runMigrations = async () => {
+  try {
+    // Connect to database
+    console.log('🔗 Connecting to PostgreSQL database...');
+    await connectDB();
+
+    console.log('🔄 Starting migrations...\n');
+
+    // Import migration files
+    const migration15 = require('./015_create_tickets_table');
+    const migration20 = require('./020_create_users_table');
+    const migration25 = require('./025_create_auth_tokens_table');
+    const migration30 = require('./030_create_roles_table');
+    const migration35 = require('./035_create_permissions_table');
+    const migration40 = require('./040_update_roles_use_permission_ids');
+    const migration45 = require('./045_create_reprint_requests_table');
+    const migration50 = require('./050_create_workflow_tables');
+    const migration55 = require('./055_add_workflow_to_reprint_requests');
+    const migration60 = require('./060_migrate_tickets_to_support_tickets');
+
+    // Run migrations in sequence
+    console.log('📦 Migration 1: Creating support_tickets table...');
+    await migration15.up();
+    console.log('✅ Migration 1 completed\n');
+
+    console.log('📦 Migration 2: Creating users table...');
+    await migration20.up();
+    console.log('✅ Migration 2 completed\n');
+
+    console.log('📦 Migration 3: Creating auth_tokens table...');
+    await migration25.up();
+    console.log('✅ Migration 3 completed\n');
+
+    console.log('📦 Migration 4: Creating roles table...');
+    await migration30.up();
+    console.log('✅ Migration 4 completed\n');
+
+    console.log('📦 Migration 5: Creating permissions table...');
+    await migration35.up();
+    console.log('✅ Migration 5 completed\n');
+
+    console.log('📦 Migration 6: Updating roles to use permission IDs...');
+    await migration40.up();
+    console.log('✅ Migration 6 completed\n');
+
+    console.log('📦 Migration 7: Creating reprint_requests table...');
+    await migration45.up();
+    console.log('✅ Migration 7 completed\n');
+
+    console.log('📦 Migration 8: Creating workflow tables...');
+    await migration50.up();
+    console.log('✅ Migration 8 completed\n');
+
+    console.log('📦 Migration 9: Adding workflow to reprint requests...');
+    await migration55.up();
+    console.log('✅ Migration 9 completed\n');
+
+    console.log('📦 Migration 10: Migrating data from tickets to support_tickets...');
+    await migration60.up();
+    console.log('✅ Migration 10 completed\n');
+
+    console.log('✨ All migrations completed successfully!');
+    process.exit(0);
+  } catch (error) {
+    console.error('❌ Migration failed:', error.message);
+    process.exit(1);
+  }
+};
+
+runMigrations();
