@@ -44,6 +44,9 @@ const reviewsRoutes = require('./routes/reviews');
 // Import Reports routes
 const reportsRoutes = require('./routes/reports');
 
+// Import Systems routes
+const systemsRoutes = require('./routes/systems');
+
 const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
@@ -123,6 +126,9 @@ app.use('/api/chat', chatRoutes);
 
 // Reports Routes
 app.use('/api/reports', reportsRoutes);
+
+// Systems Routes
+app.use('/api/systems', systemsRoutes);
 
 // Roles Routes
 app.use('/api/roles', rolesRoutes);
@@ -213,6 +219,13 @@ app.get('/api', (req, res) => {
       approvals: {
         getPending: 'GET /api/approvals/pending?userId=:userId',
         getTicketsPending: 'GET /api/approvals/tickets/pending?userId=:userId',
+      },
+      systems: {
+        getAll: 'GET /api/systems',
+        getById: 'GET /api/systems/:id',
+        create: 'POST /api/systems',
+        update: 'PUT /api/systems/:id',
+        delete: 'DELETE /api/systems/:id',
       },
     },
   });
