@@ -1,7 +1,8 @@
 const { query } = require('../config/database');
 const bcrypt = require('bcryptjs');
+const RolesModel = require('./Roles');
 
-// Role mapping: numeric IDs to role names
+// Role mapping: numeric IDs to role names (fallback for when database is not available)
 const ROLE_MAP = {
   1: 'admin',
   2: 'moderator',
@@ -16,10 +17,27 @@ const REVERSE_ROLE_MAP = {
 
 class UsersModel {
   // Helper function to convert numeric role ID to role name
-  static convertRoleToString(role) {
+  static async convertRoleToString(role) {
+    // If role is already a string, return it
+    if (typeof role === 'string') {
+      return role;
+    }
+
+    // If role is a number, try to get the role name from database
     if (typeof role === 'number') {
+      try {
+        const roleData = await RolesModel.getById(role);
+        if (roleData && roleData.name) {
+          return roleData.name;
+        }
+      } catch (error) {
+        console.warn('Error fetching role from database, using fallback:', error.message);
+      }
+
+      // Fallback to hardcoded map if database query fails
       return ROLE_MAP[role] || 'user';
     }
+
     return role || 'user';
   }
 
@@ -79,7 +97,7 @@ class UsersModel {
     } = user;
 
     // Convert numeric role to string
-    const roleString = this.convertRoleToString(role);
+    const roleString = await this.convertRoleToString(role);
 
     // Hash password
     const hashedPassword = await this.hashPassword(password);
@@ -180,7 +198,7 @@ class UsersModel {
 
     // Convert numeric role to string if provided
     if (updates.role) {
-      updates.role = this.convertRoleToString(updates.role);
+      updates.role = await this.convertRoleToString(updates.role);
     }
 
     Object.entries(updates).forEach(([key, value]) => {

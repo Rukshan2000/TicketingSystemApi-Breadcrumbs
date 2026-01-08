@@ -27,6 +27,12 @@ const runMigrations = async () => {
     const migration50 = require('./050_create_workflow_tables');
     const migration55 = require('./055_add_workflow_to_reprint_requests');
     const migration60 = require('./060_migrate_tickets_to_support_tickets');
+    const migration65 = require('./065_add_workflow_columns_to_support_tickets');
+    const migration70 = require('./070_fix_reprint_requests_foreign_key');
+    const migration75 = require('./075_change_product_id_to_varchar');
+    const migration80 = require('./080_create_chat_tables');
+    const migration85 = require('./085_create_customer_reviews_table');
+    const migration90 = require('./090_create_systems_table');
 
     // Run migrations in sequence
     console.log('📦 Migration 1: Creating support_tickets table...');
@@ -68,6 +74,30 @@ const runMigrations = async () => {
     console.log('📦 Migration 10: Migrating data from tickets to support_tickets...');
     await migration60.up();
     console.log('✅ Migration 10 completed\n');
+
+    console.log('📦 Migration 11: Adding workflow columns to support_tickets...');
+    await migration65.up();
+    console.log('✅ Migration 11 completed\n');
+
+    console.log('📦 Migration 12: Fixing reprint_requests foreign key...');
+    await migration70.up();
+    console.log('✅ Migration 12 completed\n');
+
+    console.log('📦 Migration 13: Changing product_id to varchar...');
+    await migration75.up();
+    console.log('✅ Migration 13 completed\n');
+
+    console.log('📦 Migration 14: Creating chat tables...');
+    await migration80.up();
+    console.log('✅ Migration 14 completed\n');
+
+    console.log('📦 Migration 15: Creating customer reviews table...');
+    await migration85.up();
+    console.log('✅ Migration 15 completed\n');
+
+    console.log('📦 Migration 16: Creating systems table...');
+    await migration90.up();
+    console.log('✅ Migration 16 completed\n');
 
     console.log('✨ All migrations completed successfully!');
     process.exit(0);
