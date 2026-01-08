@@ -1,23 +1,27 @@
 const { query } = require('../config/database');
 
 // Define available tables and their relationships for safe querying
+// Updated based on actual database schema inspection
 const ALLOWED_TABLES = {
   support_tickets: {
     alias: 'st',
-    columns: ['id', 'customer_id', 'subject', 'description', 'category', 'priority', 'product_id', 'order_id', 'attachments', 'status', 'created_at', 'updated_at'],
+    columns: ['id', 'customer_id', 'subject', 'description', 'category', 'priority', 'product_id', 'order_id', 'attachments', 'status', 'created_at', 'updated_at', 'workflow_id', 'approval_status', 'current_node_order'],
     joins: {
       users: { type: 'LEFT JOIN', on: 'st.customer_id = u.id', alias: 'u' },
       customer_reviews: { type: 'LEFT JOIN', on: 'st.id = cr.ticket_id', alias: 'cr' },
       ticket_approvals: { type: 'LEFT JOIN', on: 'st.id = ta.ticket_id', alias: 'ta' },
+      workflows: { type: 'LEFT JOIN', on: 'st.workflow_id = w.id', alias: 'w' },
     }
   },
   users: {
     alias: 'u',
-    columns: ['id', 'first_name', 'last_name', 'username', 'email', 'phone', 'role', 'status', 'department', 'is_verified', 'last_login', 'created_at', 'updated_at'],
+    columns: ['id', 'first_name', 'last_name', 'username', 'email', 'phone', 'role', 'status', 'department', 'is_verified', 'last_login', 'metadata', 'created_at', 'updated_at'],
     joins: {
       support_tickets: { type: 'LEFT JOIN', on: 'u.id = st.customer_id', alias: 'st' },
       workflows: { type: 'LEFT JOIN', on: 'u.id = w.created_by', alias: 'w' },
       ticket_approvals: { type: 'LEFT JOIN', on: 'u.id = ta.user_id', alias: 'ta' },
+      auth_tokens: { type: 'LEFT JOIN', on: 'u.id = at.user_id', alias: 'at' },
+      chat_conversations: { type: 'LEFT JOIN', on: 'u.id = cc.user_id', alias: 'cc' },
     }
   },
   workflows: {
@@ -26,6 +30,7 @@ const ALLOWED_TABLES = {
     joins: {
       users: { type: 'LEFT JOIN', on: 'w.created_by = u.id', alias: 'u' },
       workflow_nodes: { type: 'LEFT JOIN', on: 'w.id = wn.workflow_id', alias: 'wn' },
+      support_tickets: { type: 'LEFT JOIN', on: 'w.id = st.workflow_id', alias: 'st' },
     }
   },
   workflow_nodes: {
@@ -62,29 +67,44 @@ const ALLOWED_TABLES = {
       users: { type: 'LEFT JOIN', on: 'wnu.user_id = u.id', alias: 'u' },
     }
   },
-  reprint_requests: {
-    alias: 'rr',
-    columns: ['id', 'ticket_id', 'requested_by', 'reason', 'status', 'created_at', 'updated_at'],
-    joins: {
-      support_tickets: { type: 'LEFT JOIN', on: 'rr.ticket_id = st.id', alias: 'st' },
-      users: { type: 'LEFT JOIN', on: 'rr.requested_by = u.id', alias: 'u' },
-    }
-  },
   chat_conversations: {
     alias: 'cc',
-    columns: ['id', 'ticket_id', 'customer_id', 'agent_id', 'status', 'created_at', 'updated_at'],
+    columns: ['id', 'user_id', 'customer_id', 'ticket_id', 'status', 'assigned_admin_id', 'subject', 'is_archived', 'created_at', 'updated_at', 'closed_at'],
     joins: {
       support_tickets: { type: 'LEFT JOIN', on: 'cc.ticket_id = st.id', alias: 'st' },
-      users: { type: 'LEFT JOIN', on: 'cc.customer_id = u.id', alias: 'u' },
+      users: { type: 'LEFT JOIN', on: 'cc.user_id = u.id', alias: 'u' },
+      chat_messages: { type: 'LEFT JOIN', on: 'cc.id = cm.conversation_id', alias: 'cm' },
     }
   },
   chat_messages: {
     alias: 'cm',
-    columns: ['id', 'conversation_id', 'sender_id', 'message', 'is_read', 'created_at'],
+    columns: ['id', 'conversation_id', 'sender_id', 'sender_type', 'message', 'attachments', 'is_read', 'read_at', 'created_at', 'updated_at'],
     joins: {
       chat_conversations: { type: 'LEFT JOIN', on: 'cm.conversation_id = cc.id', alias: 'cc' },
       users: { type: 'LEFT JOIN', on: 'cm.sender_id = u.id', alias: 'u' },
     }
+  },
+  auth_tokens: {
+    alias: 'at',
+    columns: ['id', 'user_id', 'access_token', 'refresh_token', 'token_type', 'expires_at', 'refresh_expires_at', 'is_revoked', 'device_info', 'ip_address', 'user_agent', 'created_at', 'updated_at'],
+    joins: {
+      users: { type: 'LEFT JOIN', on: 'at.user_id = u.id', alias: 'u' },
+    }
+  },
+  roles: {
+    alias: 'r',
+    columns: ['id', 'name', 'description', 'permissions', 'is_active', 'created_at', 'updated_at'],
+    joins: {}
+  },
+  permissions: {
+    alias: 'p',
+    columns: ['id', 'parent_id', 'name', 'description', 'created_at', 'updated_at'],
+    joins: {}
+  },
+  systems: {
+    alias: 'sys',
+    columns: ['id', 'system_name', 'system_description', 'status', 'responsible_person', 'system_documentation', 'created_at', 'updated_at'],
+    joins: {}
   }
 };
 
