@@ -122,7 +122,7 @@ app.use('/api/workflow-nodes', workflowNodesRoutes);
 app.use('/api/approvals', approvalsRoutes);
 
 // Chat Routes (with WebSocket support)
-app.use('/api/chat', chatRoutes);
+app.use('/api/conversations', chatRoutes);
 
 // Reports Routes
 app.use('/api/reports', reportsRoutes);

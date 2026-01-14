@@ -6,8 +6,8 @@ const router = express.Router();
 // Create a new conversation
 router.post('/', ChatController.createConversation);
 
-// Get all conversations for admins
-router.get('/admin/all', ChatController.getAdminConversations);
+// Get all conversations for admins (must be before :conversationId)
+router.get('/admin', ChatController.getAdminConversations);
 
 // Get conversations for a specific user
 router.get('/user/:userId', ChatController.getUserConversations);
